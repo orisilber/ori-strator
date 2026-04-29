@@ -36,13 +36,23 @@ Worktrees: `.prd-solver-worktrees/<prd-slug>/iter-<N>/` on branch `prd-solver/<p
 
 `<prd-slug>` = PRD filename without extension, lowercased, non-alphanum → `-`.
 
+# Shell hygiene (applies to every Bash call you make)
+
+Bash commands run in the user's shell, often **zsh**. zsh errors on globs that match nothing (default `nomatch` behavior). To stay portable across bash and zsh:
+
+- For existence checks, use `[ -f "<path>" ]` / `[ -d "<path>" ]` / `test -f`. **Never** use `ls dir/*.md` to test existence — it fails loudly when the dir is empty.
+- To list files in a dir that may be empty, use `find "<dir>" -maxdepth 1 -type f -name '*.md' 2>/dev/null` or plain `ls "<dir>"` with no glob.
+- When chaining with `&&`, a failed earlier command aborts the chain. Use `|| true` for "ok if missing" probes (e.g. `git worktree remove --force "<path>" 2>/dev/null || true`).
+- Never run `setopt`, `shopt`, or other shell-builtin tweaks — they don't survive across Bash calls and break under the wrong shell.
+
 # Phase 0 — Setup (do once)
 
-1. Resolve the PRD path to absolute. Read it. If missing, stop.
+1. Resolve the PRD path to absolute. **First, strip a leading `@` if present** — Claude Code's file-attachment syntax passes `@path/to/file` as the literal argument, and the `@` is not part of the path. After stripping, resolve to absolute and verify the file exists with `[ -f "<absolute>" ]`. If missing, stop and tell the user.
 2. Compute `<prd-slug>`.
 3. `mkdir -p` the state dir, memories dir, and worktrees root in the user's project.
 4. **Resolve each prompt + config** — for each of `planner-prompt.md`, `architect-prompt.md`, `coder-prompt.md`, `reviewer-prompt.md`, `config.json`:
-   - If `.claude/prd-solver/<file>` exists in the user's cwd, use that absolute path.
+   - Existence check: `[ -f ".claude/prd-solver/<file>" ]` (no globs).
+   - If present, use that absolute path.
    - Else, use `${CLAUDE_PLUGIN_ROOT}/prd-solver/<file>`.
    - Print one line per file: `<file>: project | plugin`.
 5. Read the resolved `config.json`. Pick `chunk_size` (CLI arg > config > 1) and `validation_command` (config or null).
@@ -101,11 +111,11 @@ Resolve to absolute → `WORKTREE`.
 
 ### e. Select memories (selective loading)
 
-List all files in the memories dir. For each, read its YAML frontmatter:
+List files in the memories dir using `find "<memories_dir>" -maxdepth 1 -type f -name '*.md' 2>/dev/null` (do **not** use shell globs — the dir is empty on iteration 1 and zsh errors on empty globs). For each file, read its YAML frontmatter:
 - Include if `scope: global`
 - Include if `tasks` intersects the current chunk's task ids
 
-Concatenate the included memories in filename order. Do **not** dump everything — that defeats the point.
+Concatenate the included memories in filename order. Do **not** dump everything — that defeats the point. If `find` returns nothing, treat as `(none)` and continue.
 
 ### f. Spawn the architect
 
