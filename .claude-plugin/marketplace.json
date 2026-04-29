@@ -1,6 +1,9 @@
 {
   "name": "ori-strator",
-  "owner": "orisilber",
+  "owner": {
+    "name": "orisilber",
+    "url": "https://github.com/orisilber"
+  },
   "plugins": [
     {
       "name": "ori-strator",
