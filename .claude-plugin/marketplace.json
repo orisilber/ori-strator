@@ -1,0 +1,14 @@
+{
+  "name": "ori-strator",
+  "owner": "orisilber",
+  "plugins": [
+    {
+      "name": "ori-strator",
+      "description": "Iterative PRD solver with planner + architect/coder/reviewer loop, fresh-context worktrees, tagged memories, branch chaining.",
+      "source": {
+        "type": "git",
+        "url": "https://github.com/orisilber/ori-strator"
+      }
+    }
+  ]
+}

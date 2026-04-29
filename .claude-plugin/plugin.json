@@ -1,0 +1,10 @@
+{
+  "name": "ori-strator",
+  "version": "0.1.0",
+  "description": "Iteratively solve PRDs with a planner-architect-coder-reviewer loop. Each iteration runs in a fresh git worktree with cleared agent context, takes one bite-sized task chunk, writes tagged memories for the next iteration, and commits its changes.",
+  "author": {
+    "name": "Ori Silber"
+  },
+  "homepage": "https://github.com/orisilber/ori-strator",
+  "repository": "https://github.com/orisilber/ori-strator"
+}

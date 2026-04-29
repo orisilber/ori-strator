@@ -1,0 +1,10 @@
+{
+  "chunk_size": 1,
+  "validation_command": null,
+  "validation_timeout_seconds": 120,
+  "_comments": {
+    "chunk_size": "How many tasks the orchestrator hands to one architect run. Keep small (1-3) to avoid context drift. CLI arg overrides this.",
+    "validation_command": "Optional shell command run in the worktree after a READY verdict. Example: 'npm run typecheck' or 'pnpm test -- --run unit/foo.test.ts'. If null, gate is skipped. If set and it fails, the iteration is downgraded to NEEDS_WORK.",
+    "validation_timeout_seconds": "Hard cap for the validation command."
+  }
+}
